@@ -1,0 +1,48 @@
+name: Musinsa Price & Restock Tracker
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  track-musinsa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 1. 저장소 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 2. Python 3.11 환경 세팅
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 3. 필수 패키지 설치
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+
+      - name: 4. 무신사 가격/재고 추적 및 텔레그램 알림 실행
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -f "tracker.py" ]; then
+            python tracker.py
+          elif [ -f "musinsa-price-tracker/tracker.py" ]; then
+            cd musinsa-price-tracker && python tracker.py
+          fi
+
+      - name: 5. 최신 가격 및 재고 상태 자동 커밋
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git diff --staged --quiet || git commit -m "chore: update Musinsa price & stock state [skip ci]"
+          git push
