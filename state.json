@@ -1,30 +1,30 @@
 {
   "3849102": {
-    "current_price": 67800,
-    "lowest_price": 65900,
+    "current_price": 36900,
+    "lowest_price": 36900,
     "in_stock": true,
-    "notified_target_price": 67800,
-    "updated_at": "2026-10-27 15:34"
+    "notified_target_price": 36900,
+    "updated_at": "2026-10-29 14:15"
   },
   "4102938": {
-    "current_price": 116100,
-    "lowest_price": 104000,
+    "current_price": 19800,
+    "lowest_price": 19800,
     "in_stock": true,
-    "notified_target_price": null,
-    "updated_at": "2026-10-27 15:34"
+    "notified_target_price": 19800,
+    "updated_at": "2026-10-29 14:15"
   },
   "3991827": {
-    "current_price": 43900,
-    "lowest_price": 43900,
+    "current_price": 26900,
+    "lowest_price": 26900,
     "in_stock": false,
-    "notified_target_price": 43900,
-    "updated_at": "2026-10-27 15:34"
+    "notified_target_price": 26900,
+    "updated_at": "2026-10-29 14:15"
   },
   "4519201": {
-    "current_price": 62300,
-    "lowest_price": 58000,
+    "current_price": 25900,
+    "lowest_price": 25900,
     "in_stock": true,
-    "notified_target_price": null,
-    "updated_at": "2026-10-27 15:34"
+    "notified_target_price": 25900,
+    "updated_at": "2026-10-29 14:15"
   }
 }

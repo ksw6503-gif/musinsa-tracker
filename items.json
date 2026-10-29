@@ -2,15 +2,15 @@
   {
     "id": "3849102",
     "url": "https://www.musinsa.com/products/3849102",
-    "brand": "무신사 스탠다드 (MUSINSA STANDARD)",
-    "name": "릴렉스드 베이직 블레이저 [블랙]",
+    "brand": "노이아고",
+    "name": "NOI1174 오버핏 비건레더 자켓 (버건디)",
     "target_size": "L",
     "target_price": 69000,
-    "current_price": 67800,
-    "original_price": 89900,
-    "lowest_price": 65900,
-    "last_price": 75900,
-    "discount_rate": 25,
+    "current_price": 36900,
+    "original_price": 123000,
+    "lowest_price": 36900,
+    "last_price": 67800,
+    "discount_rate": 70,
     "in_stock": true,
     "sizes": {
       "S": true,
@@ -19,20 +19,20 @@
       "XL": false,
       "2XL": false
     },
-    "updated_at": "2026-10-27 15:34"
+    "updated_at": "2026-10-29 14:15"
   },
   {
     "id": "4102938",
     "url": "https://www.musinsa.com/products/4102938",
-    "brand": "아디다스 (ADIDAS)",
-    "name": "삼바 OG - 화이트:블랙 / B75806",
+    "brand": "디어스토커",
+    "name": "LIDIA OFF SHOULDER T - PINK",
     "target_size": "270",
     "target_price": 109000,
-    "current_price": 116100,
-    "original_price": 139000,
-    "lowest_price": 104000,
-    "last_price": 139000,
-    "discount_rate": 16,
+    "current_price": 19800,
+    "original_price": 44000,
+    "lowest_price": 19800,
+    "last_price": 116100,
+    "discount_rate": 55,
     "in_stock": true,
     "sizes": {
       "250": false,
@@ -42,40 +42,40 @@
       "275": false,
       "280": true
     },
-    "updated_at": "2026-10-27 15:34"
+    "updated_at": "2026-10-29 14:15"
   },
   {
     "id": "3991827",
     "url": "https://www.musinsa.com/products/3991827",
-    "brand": "토피 (TOFFEE)",
-    "name": "2WAY 스웻 후드 집업 (MELANGE GREY)",
+    "brand": "에스티코",
+    "name": "클래식핏 링클프리 히든밴드 스판 팬츠 (네이비)",
     "target_size": "XL",
     "target_price": 45000,
-    "current_price": 43900,
-    "original_price": 59000,
-    "lowest_price": 43900,
-    "last_price": 49900,
-    "discount_rate": 26,
+    "current_price": 26900,
+    "original_price": 59900,
+    "lowest_price": 26900,
+    "last_price": 43900,
+    "discount_rate": 55,
     "in_stock": false,
     "sizes": {
       "M": true,
       "L": true,
       "XL": false
     },
-    "updated_at": "2026-10-27 15:34"
+    "updated_at": "2026-10-29 14:15"
   },
   {
     "id": "4519201",
     "url": "https://www.musinsa.com/products/4519201",
-    "brand": "커버낫 (COVERNAT)",
-    "name": "씨 로고 코튼 가디건 블랙",
+    "brand": "에스이에스티",
+    "name": "DRAW 맨투맨 티셔츠 - 그레이",
     "target_size": "L",
     "target_price": 59000,
-    "current_price": 62300,
-    "original_price": 89000,
-    "lowest_price": 58000,
+    "current_price": 25900,
+    "original_price": 62000,
+    "lowest_price": 25900,
     "last_price": 62300,
-    "discount_rate": 30,
+    "discount_rate": 58,
     "in_stock": true,
     "sizes": {
       "S": true,
@@ -83,6 +83,6 @@
       "L": true,
       "XL": true
     },
-    "updated_at": "2026-10-27 15:34"
+    "updated_at": "2026-10-29 14:15"
   }
 ]
