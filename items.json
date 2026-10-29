@@ -1,0 +1,88 @@
+[
+  {
+    "id": "3849102",
+    "url": "https://www.musinsa.com/products/3849102",
+    "brand": "무신사 스탠다드 (MUSINSA STANDARD)",
+    "name": "릴렉스드 베이직 블레이저 [블랙]",
+    "target_size": "L",
+    "target_price": 69000,
+    "current_price": 67800,
+    "original_price": 89900,
+    "lowest_price": 65900,
+    "last_price": 75900,
+    "discount_rate": 25,
+    "in_stock": true,
+    "sizes": {
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": false,
+      "2XL": false
+    },
+    "updated_at": "2026-10-27 15:34"
+  },
+  {
+    "id": "4102938",
+    "url": "https://www.musinsa.com/products/4102938",
+    "brand": "아디다스 (ADIDAS)",
+    "name": "삼바 OG - 화이트:블랙 / B75806",
+    "target_size": "270",
+    "target_price": 109000,
+    "current_price": 116100,
+    "original_price": 139000,
+    "lowest_price": 104000,
+    "last_price": 139000,
+    "discount_rate": 16,
+    "in_stock": true,
+    "sizes": {
+      "250": false,
+      "260": true,
+      "265": false,
+      "270": true,
+      "275": false,
+      "280": true
+    },
+    "updated_at": "2026-10-27 15:34"
+  },
+  {
+    "id": "3991827",
+    "url": "https://www.musinsa.com/products/3991827",
+    "brand": "토피 (TOFFEE)",
+    "name": "2WAY 스웻 후드 집업 (MELANGE GREY)",
+    "target_size": "XL",
+    "target_price": 45000,
+    "current_price": 43900,
+    "original_price": 59000,
+    "lowest_price": 43900,
+    "last_price": 49900,
+    "discount_rate": 26,
+    "in_stock": false,
+    "sizes": {
+      "M": true,
+      "L": true,
+      "XL": false
+    },
+    "updated_at": "2026-10-27 15:34"
+  },
+  {
+    "id": "4519201",
+    "url": "https://www.musinsa.com/products/4519201",
+    "brand": "커버낫 (COVERNAT)",
+    "name": "씨 로고 코튼 가디건 블랙",
+    "target_size": "L",
+    "target_price": 59000,
+    "current_price": 62300,
+    "original_price": 89000,
+    "lowest_price": 58000,
+    "last_price": 62300,
+    "discount_rate": 30,
+    "in_stock": true,
+    "sizes": {
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": true
+    },
+    "updated_at": "2026-10-27 15:34"
+  }
+]

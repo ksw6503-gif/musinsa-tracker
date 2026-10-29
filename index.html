@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MUSINSA PULSE — 개인용 무신사 가격 추적 & 재입고 알림 대시보드</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+          },
+          colors: {
+            musinsa: {
+              black: '#000000',
+              dark: '#111111',
+              card: '#18181b',
+              border: '#27272a',
+              red: '#ff3b30',
+              green: '#10b981',
+              blue: '#3b82f6'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes pulseSlide {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-card {
+      animation: pulseSlide 0.22s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900 dark:bg-[#0a0a0c] dark:text-zinc-100 min-h-screen pb-28 transition-colors duration-200">
+
+  <!-- 상단 고정 헤더 (무신사 감성 블랙 & 화이트) -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-[#0a0a0c]/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800">
+    <div class="max-w-xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-extrabold text-sm tracking-tighter">
+          M
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="font-extrabold text-base tracking-tight">MUSINSA PULSE</h1>
+            <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900">PRO</span>
+          </div>
+          <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-none mt-0.5">24H 클라우드 가격·사이즈 재입고 추적</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button id="btnSimulateAlert" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 transition flex items-center gap-1" title="실시간 가격 하락 및 텔레그램 알림 시뮬레이션">
+          <span>⚡</span>
+          <span class="hidden sm:inline">변동 테스트</span>
+        </button>
+        <button id="btnOpenSettings" type="button" class="p-2 rounded-lg text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 transition" aria-label="텔레그램 및 GitHub 연동 설정">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </button>
+        <button id="btnToggleTheme" type="button" class="p-2 rounded-lg text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 transition" aria-label="다크/라이트 모드 전환">
+          <svg id="iconSun" class="w-5 h-5 hidden dark:block text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <svg id="iconMoon" class="w-5 h-5 block dark:hidden text-zinc-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 컨테이너 -->
+  <main class="max-w-xl mx-auto px-4 pt-4 space-y-5">
+
+    <!-- 1. 상단 요약 카드 (총 상품 수 / 가격 하락 / 목표가 도달) -->
+    <section aria-label="추적 요약 지표" class="grid grid-cols-3 gap-2.5">
+      <button type="button" data-filter="all" class="summary-card text-left p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm transition hover:border-zinc-400 dark:hover:border-zinc-600">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">등록 상품</span>
+          <span class="w-2 h-2 rounded-full bg-zinc-900 dark:bg-white"></span>
+        </div>
+        <p id="statTotal" class="text-2xl font-extrabold mt-1.5 tracking-tight">0</p>
+        <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">전체 모니터링</p>
+      </button>
+
+      <button type="button" data-filter="dropped" class="summary-card text-left p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm transition hover:border-rose-400 dark:hover:border-rose-500">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">가격 하락</span>
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+        </div>
+        <p id="statDropped" class="text-2xl font-extrabold mt-1.5 tracking-tight text-rose-500">0</p>
+        <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">직전가 대비 인하</p>
+      </button>
+
+      <button type="button" data-filter="targetReached" class="summary-card text-left p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm transition hover:border-emerald-400 dark:hover:border-emerald-500">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">목표가 도달</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        </div>
+        <p id="statTarget" class="text-2xl font-extrabold mt-1.5 tracking-tight text-emerald-500">0</p>
+        <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">희망가 이하 매수적기</p>
+      </button>
+    </section>
+
+    <!-- 2. 검색, 필터 탭 & 백업/복원 툴바 -->
+    <section class="space-y-2.5">
+      <div class="flex items-center gap-2">
+        <div class="relative flex-1">
+          <svg class="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input id="searchInput" type="text" placeholder="브랜드, 상품명, 품번 검색..." class="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition" />
+        </div>
+        <button id="btnExportJson" type="button" class="px-3 py-2.5 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition shrink-0" title="items.json 백업 다운로드">
+          백업
+        </button>
+        <button id="btnImportTrigger" type="button" class="px-3 py-2.5 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition shrink-0" title="JSON 파일 복원">
+          복원
+        </button>
+        <input id="fileImportInput" type="file" accept=".json,application/json" class="hidden" />
+      </div>
+
+      <!-- 필터 칩 -->
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+        <button type="button" data-chip="all" class="filter-chip px-3 py-1.5 rounded-full text-xs font-semibold bg-black text-white dark:bg-white dark:text-black shrink-0 transition">
+          전체 보기
+        </button>
+        <button type="button" data-chip="targetReached" class="filter-chip px-3 py-1.5 rounded-full text-xs font-semibold bg-zinc-200/80 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 shrink-0 transition">
+          🎯 목표가 도달
+        </button>
+        <button type="button" data-chip="dropped" class="filter-chip px-3 py-1.5 rounded-full text-xs font-semibold bg-zinc-200/80 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 shrink-0 transition">
+          📉 가격 하락
+        </button>
+        <button type="button" data-chip="instock" class="filter-chip px-3 py-1.5 rounded-full text-xs font-semibold bg-zinc-200/80 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 shrink-0 transition">
+          🟢 타겟 사이즈 구매가능
+        </button>
+        <button type="button" data-chip="soldout" class="filter-chip px-3 py-1.5 rounded-full text-xs font-semibold bg-zinc-200/80 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 shrink-0 transition">
+          🔴 품절 (재입고 대기)
+        </button>
+      </div>
+    </section>
+
+    <!-- 3. 상품 카드 리스트 -->
+    <section id="productList" class="space-y-3" aria-live="polite"></section>
+
+    <!-- 빈 상태 안내 -->
+    <section id="emptyState" class="hidden py-12 px-4 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-dashed border-zinc-300 dark:border-zinc-800">
+      <div class="w-12 h-12 mx-auto rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xl mb-3">
+        🛍️
+      </div>
+      <h2 class="text-sm font-bold">조건에 맞는 무신사 상품이 없습니다</h2>
+      <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">하단의 '+ 무신사 상품 등록' 버튼을 눌러 추적할 상품을 추가해 보세요.</p>
+    </section>
+
+    <!-- 4. 최근 텔레그램 알림 발송 로그 프리뷰 (폴센트 감성) -->
+    <section class="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-sm">📲</span>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">최근 텔레그램 푸시 알림 프리뷰</h2>
+        </div>
+        <button id="btnClearLogs" type="button" class="text-[11px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">로그 비우기</button>
+      </div>
+      <div id="telegramLogContainer" class="space-y-2 text-xs"></div>
+    </section>
+  </main>
+
+  <!-- 하단 고정 플로팅 액션 바 (한 손 엄지 조작 최적화) -->
+  <div class="fixed bottom-0 inset-x-0 z-30 bg-gradient-to-t from-zinc-50 via-zinc-50/95 to-transparent dark:from-[#0a0a0c] dark:via-[#0a0a0c]/95 pb-4 pt-3 px-4">
+    <div class="max-w-xl mx-auto flex items-center gap-2.5">
+      <button id="btnOpenAddModal" type="button" class="flex-1 py-3.5 px-5 rounded-2xl bg-black text-white dark:bg-white dark:text-black font-bold text-sm shadow-lg flex items-center justify-center gap-2 active:scale-[0.99] transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <span>무신사 상품 등록</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 모달 1: 무신사 상품 등록 / 수정 모달 -->
+  <div id="addModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4">
+    <div class="w-full max-w-lg rounded-t-3xl sm:rounded-3xl bg-white dark:bg-zinc-900 border-t sm:border border-zinc-200 dark:border-zinc-800 p-5 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 id="modalTitle" class="text-base font-extrabold">무신사 관심 상품 등록</h2>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400">상품 URL과 타겟 사이즈, 목표 희망가를 설정하세요</p>
+        </div>
+        <button id="btnCloseAddModal" type="button" class="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500" aria-label="닫기">
+          ✕
+        </button>
+      </div>
+
+      <form id="productForm" class="space-y-3.5">
+        <input type="hidden" id="editItemId" value="" />
+
+        <div>
+          <label for="inputUrl" class="block text-xs font-bold mb-1 text-zinc-700 dark:text-zinc-300">무신사 상품 URL 또는 품번 *</label>
+          <input id="inputUrl" type="text" required placeholder="https://www.musinsa.com/products/3849102" class="w-full px-3.5 py-2.5 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white" />
+          <p class="text-[11px] text-zinc-400 mt-1">URL을 붙여넣으면 품번이 자동 추출됩니다.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label for="inputBrand" class="block text-xs font-bold mb-1 text-zinc-700 dark:text-zinc-300">브랜드명</label>
+            <input id="inputBrand" type="text" placeholder="예: 무신사 스탠다드" class="w-full px-3.5 py-2.5 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white" />
+          </div>
+          <div>
+            <label for="inputTargetSize" class="block text-xs font-bold mb-1 text-zinc-700 dark:text-zinc-300">내 타겟 사이즈 *</label>
+            <select id="inputTargetSize" class="w-full px-3.5 py-2.5 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white">
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L" selected>L</option>
+              <option value="XL">XL</option>
+              <option value="2XL">2XL</option>
+              <option value="FREE">FREE</option>
+              <option value="260">260 (신발)</option>
+              <option value="265">265 (신발)</option>
+              <option value="270">270 (신발)</option>
+              <option value="275">275 (신발)</option>
+              <option value="280">280 (신발)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="inputName" class="block text-xs font-bold mb-1 text-zinc-700 dark:text-zinc-300">상품명</label>
+          <input id="inputName" type="text" placeholder="미입력 시 tracker.py가 자동 수집합니다" class="w-full px-3.5 py-2.5 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white" />
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5">
+          <div>
+            <label for="inputTargetPrice" class="block text-xs font-bold mb-1 text-emerald-600 dark:text-emerald-400">목표 알림 희망가(원) *</label>
+            <input id="inputTargetPrice" type="number" min="1000" step="100" required placeholder="59000" class="w-full px-3 py-2.5 rounded-xl text-sm font-bold bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label for="inputCurrentPrice" class="block text-xs font-bold mb-1 text-zinc-700 dark:text-zinc-300">현재 판매가(원)</label>
+            <input id="inputCurrentPrice" type="number" min="0" step="100" placeholder="69000" class="w-full px-3 py-2.5 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 focus:outline-none" />
+          </div>
+          <div>
+            <label for="inputOriginalPrice" class="block text-xs font-bold mb-1 text-zinc-700 dark:text-zinc-300">정상가(원)</label>
+            <input id="inputOriginalPrice" type="number" min="0" step="100" placeholder="89000" class="w-full px-3 py-2.5 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/60">
+          <div>
+            <p class="text-xs font-bold">현재 타겟 사이즈 재고 상태</p>
+            <p class="text-[11px] text-zinc-500 dark:text-zinc-400">품절 상태로 두면 재입고 시 즉시 알림을 발송합니다</p>
+          </div>
+          <label class="inline-flex items-center cursor-pointer">
+            <input id="inputInStock" type="checkbox" checked class="sr-only peer" />
+            <div class="w-11 h-6 bg-zinc-300 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all relative peer-checked:bg-emerald-500"></div>
+            <span id="stockToggleLabel" class="ml-2 text-xs font-bold text-emerald-500">구매 가능</span>
+          </label>
+        </div>
+
+        <div class="pt-2 flex items-center gap-2">
+          <button id="btnCancelModal" type="button" class="w-1/3 py-3 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition">
+            취소
+          </button>
+          <button type="submit" class="w-2/3 py-3 rounded-xl text-xs font-bold bg-black text-white dark:bg-white dark:text-black shadow-md transition">
+            저장 및 추적 시작
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 모달 2: 텔레그램 웹훅 테스트 & GitHub 연동 설정 모달 -->
+  <div id="settingsModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4">
+    <div class="w-full max-w-lg rounded-t-3xl sm:rounded-3xl bg-white dark:bg-zinc-900 border-t sm:border border-zinc-200 dark:border-zinc-800 p-5 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-extrabold">텔레그램 알림 & 클라우드 동기화 설정</h2>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400">브라우저에서 즉시 텔레그램 테스트 메시지를 발송해 볼 수 있습니다</p>
+        </div>
+        <button id="btnCloseSettingsModal" type="button" class="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500" aria-label="닫기">
+          ✕
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label for="tgBotToken" class="block text-xs font-bold mb-1">Telegram Bot Token (선택 - 테스트 발송용)</label>
+          <input id="tgBotToken" type="password" placeholder="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ" class="w-full px-3.5 py-2.5 rounded-xl text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700" />
+        </div>
+        <div>
+          <label for="tgChatId" class="block text-xs font-bold mb-1">Telegram Chat ID (선택 - 테스트 발송용)</label>
+          <input id="tgChatId" type="text" placeholder="예: 987654321" class="w-full px-3.5 py-2.5 rounded-xl text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700" />
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/70 text-xs space-y-1.5">
+          <p class="font-bold text-zinc-800 dark:text-zinc-200">💡 24시간 무인 클라우드 동작 원리</p>
+          <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            1. 평소에는 GitHub Actions의 <code class="px-1 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700">tracker.yml</code>이 30분마다 <code class="px-1 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700">items.json</code>을 읽고 무신사 가격/재고를 체크합니다.<br />
+            2. 웹 대시보드에서 상품을 추가한 뒤 상단 <strong>[백업]</strong> 버튼을 눌러 <code class="px-1 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700">items.json</code>을 GitHub 저장소에 덮어쓰면 24시간 클라우드 추적에 즉시 반영됩니다.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <button id="btnSendTestTelegram" type="button" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition">
+            ✈️ 내 텔레그램으로 테스트 알림 보내기
+          </button>
+          <button id="btnSaveSettings" type="button" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-black text-white dark:bg-white dark:text-black transition">
+            설정 저장
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토스트 알림 -->
+  <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 hidden px-4 py-2.5 rounded-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-bold shadow-xl"></div>
+
+  <script>
+    const STORAGE_KEY = 'musinsa_pulse_items_v1';
+    const LOG_STORAGE_KEY = 'musinsa_pulse_logs_v1';
+    const SETTINGS_KEY = 'musinsa_pulse_settings_v1';
+    const THEME_KEY = 'musinsa_pulse_theme_v1';
+
+    const DEFAULT_ITEMS = [
+      {
+        id: '3849102',
+        url: 'https://www.musinsa.com/products/3849102',
+        brand: '무신사 스탠다드 (MUSINSA STANDARD)',
+        name: '릴렉스드 베이직 블레이저 [블랙]',
+        target_size: 'L',
+        target_price: 69000,
+        current_price: 67800,
+        original_price: 89900,
+        lowest_price: 65900,
+        last_price: 75900,
+        discount_rate: 25,
+        in_stock: true,
+        updated_at: '2026-10-27 15:00'
+      },
+      {
+        id: '4102938',
+        url: 'https://www.musinsa.com/products/4102938',
+        brand: '아디다스 (ADIDAS)',
+        name: '삼바 OG - 화이트:블랙 / B75806',
+        target_size: '270',
+        target_price: 109000,
+        current_price: 116100,
+        original_price: 139000,
+        lowest_price: 104000,
+        last_price: 139000,
+        discount_rate: 16,
+        in_stock: true,
+        updated_at: '2026-10-27 15:00'
+      },
+      {
+        id: '3991827',
+        url: 'https://www.musinsa.com/products/3991827',
+        brand: '토피 (TOFFEE)',
+        name: '2WAY 스웻 후드 집업 (MELANGE GREY)',
+        target_size: 'XL',
+        target_price: 45000,
+        current_price: 43900,
+        original_price: 59000,
+        lowest_price: 43900,
+        last_price: 49900,
+        discount_rate: 26,
+        in_stock: false,
+        updated_at: '2026-10-27 15:00'
+      },
+      {
+        id: '4519201',
+        url: 'https://www.musinsa.com/products/4519201',
+        brand: '커버낫 (COVERNAT)',
+        name: '씨 로고 코튼 가디건 블랙',
+        target_size: 'L',
+        target_price: 59000,
+        current_price: 62300,
+        original_price: 89000,
+        lowest_price: 58000,
+        last_price: 62300,
+        discount_rate: 30,
+        in_stock: true,
+        updated_at: '2026-10-27 15:00'
+      }
+    ];
+
+    const DEFAULT_LOGS = [
+      {
+        time: '15:00',
+        badge: '🎯 [목표가 도달]',
+        title: '[무신사 스탠다드] 릴렉스드 베이직 블레이저 [블랙] (L)',
+        detail: '75,900원 ➔ 67,800원 (-10.7%) | 목표 희망가 69,000원 이하 달성!'
+      },
+      {
+        time: '14:30',
+        badge: '🔥 [역대 최저가 갱신]',
+        title: '[토피] 2WAY 스웻 후드 집업 (XL)',
+        detail: '49,900원 ➔ 43,900원 (-12.0%) | 역대 최저가 갱신!'
+      }
+    ];
+
+    let state = {
+      items: [],
+      logs: [],
+      filter: 'all',
+      search: '',
+      settings: { botToken: '', chatId: '' }
+    };
+
+    function safeGetStorage(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function safeSetStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (e) {
+        // Ignore storage quota errors in sandboxed frames
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2400);
+    }
+
+    function formatKRW(num) {
+      return Number(num || 0).toLocaleString('ko-KR') + '원';
+    }
+
+    function extractGoodsNo(input) {
+      const str = String(input || '').trim();
+      if (/^\d+$/.test(str)) return str;
+      const match = str.match(/(?:products|app\/goods)\/(\d+)/);
+      if (match) return match[1];
+      const digits = str.match(/\d{5,10}/);
+      return digits ? digits[0] : String(Date.now()).slice(-7);
+    }
+
+    function initTheme() {
+      try {
+        const savedTheme = localStorage.getItem(THEME_KEY);
+        if (savedTheme === 'light') {
+          document.documentElement.classList.remove('dark');
+        } else {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {
+        document.documentElement.classList.add('dark');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      try {
+        localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+      } catch (e) {}
+      showToast(isDark ? '다크 모드가 적용되었습니다' : '라이트 모드가 적용되었습니다');
+    }
+
+    function updateSummaryStats() {
+      const total = state.items.length;
+      const dropped = state.items.filter(i => i.last_price && i.current_price < i.last_price).length;
+      const targetReached = state.items.filter(i => i.target_price > 0 && i.current_price <= i.target_price).length;
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statDropped').textContent = dropped;
+      document.getElementById('statTarget').textContent = targetReached;
+    }
+
+    function getFilteredItems() {
+      return state.items.filter(item => {
+        if (state.filter === 'dropped' && !(item.last_price && item.current_price < item.last_price)) {
+          return false;
+        }
+        if (state.filter === 'targetReached' && !(item.target_price > 0 && item.current_price <= item.target_price)) {
+          return false;
+        }
+        if (state.filter === 'instock' && !item.in_stock) {
+          return false;
+        }
+        if (state.filter === 'soldout' && item.in_stock) {
+          return false;
+        }
+        if (state.search.trim()) {
+          const q = state.search.trim().toLowerCase();
+          const hay = `${item.brand} ${item.name} ${item.id} ${item.target_size}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderFilterChips() {
+      document.querySelectorAll('.filter-chip').forEach(btn => {
+        const active = btn.getAttribute('data-chip') === state.filter;
+        if (active) {
+          btn.className = 'filter-chip px-3 py-1.5 rounded-full text-xs font-semibold bg-black text-white dark:bg-white dark:text-black shrink-0 transition';
+        } else {
+          btn.className = 'filter-chip px-3 py-1.5 rounded-full text-xs font-semibold bg-zinc-200/80 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 shrink-0 transition';
+        }
+      });
+    }
+
+    function renderProducts() {
+      updateSummaryStats();
+      renderFilterChips();
+
+      const listEl = document.getElementById('productList');
+      const emptyEl = document.getElementById('emptyState');
+      const filtered = getFilteredItems();
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+        return;
+      }
+      emptyEl.classList.add('hidden');
+
+      listEl.innerHTML = filtered.map(item => {
+        const isTargetMet = item.target_price > 0 && item.current_price <= item.target_price;
+        const isDropped = item.last_price && item.current_price < item.last_price;
+        const dropPct = isDropped ? Math.round(((item.last_price - item.current_price) / item.last_price) * 100) : 0;
+        const isAllTimeLow = item.lowest_price && item.current_price <= item.lowest_price;
+        const diffFromLow = item.lowest_price ? item.current_price - item.lowest_price : 0;
+
+        const discountRate = item.original_price > item.current_price
+          ? Math.round((1 - item.current_price / item.original_price) * 100)
+          : (item.discount_rate || 0);
+
+        const lowestStatusHtml = isAllTimeLow
+          ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20">🔥 역대 최저가</span>`
+          : `<span class="text-[11px] text-zinc-500 dark:text-zinc-400">역대 최저가(${formatKRW(item.lowest_price)}) 대비 +${formatKRW(diffFromLow)}</span>`;
+
+        const stockBadgeHtml = item.in_stock
+          ? `<button type="button" data-action="toggle-stock" data-id="${item.id}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+               사이즈 ${item.target_size} · 구매 가능
+             </button>`
+          : `<button type="button" data-action="toggle-stock" data-id="${item.id}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+               <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
+               사이즈 ${item.target_size} · 품절 (재입고 대기)
+             </button>`;
+
+        return `
+          <article class="animate-card rounded-2xl bg-white dark:bg-zinc-900 border ${isTargetMet ? 'border-emerald-500/60 dark:border-emerald-500/50' : 'border-zinc-200 dark:border-zinc-800'} p-4 shadow-xs space-y-3">
+            <!-- 상단 메타 & 배지 -->
+            <div class="flex items-start justify-between gap-2">
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100">${item.brand}</span>
+                  <span class="text-[11px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 font-mono">#${item.id}</span>
+                  ${isTargetMet ? `<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white">🎯 목표가 도달</span>` : ''}
+                  ${isDropped ? `<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500 text-white">📉 직전 대비 -${dropPct}%</span>` : ''}
+                </div>
+                <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-100 leading-snug pt-0.5">${item.name}</h3>
+              </div>
+
+              <div class="flex items-center gap-1 shrink-0">
+                <button type="button" data-action="edit" data-id="${item.id}" class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800" title="목표가/사이즈 수정">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                  </svg>
+                </button>
+                <button type="button" data-action="delete" data-id="${item.id}" class="p-1.5 rounded-lg text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40" title="상품 삭제">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- 가격 정보 박스 -->
+            <div class="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-between gap-2">
+              <div>
+                <div class="flex items-baseline gap-1.5">
+                  ${discountRate > 0 ? `<span class="text-base font-extrabold text-rose-500">${discountRate}%</span>` : ''}
+                  <span class="text-lg font-extrabold tracking-tight">${formatKRW(item.current_price)}</span>
+                  ${item.original_price > item.current_price ? `<span class="text-xs text-zinc-400 line-through">${formatKRW(item.original_price)}</span>` : ''}
+                </div>
+                <div class="mt-1 flex items-center gap-2 flex-wrap">
+                  ${lowestStatusHtml}
+                </div>
+              </div>
+
+              <div class="text-right">
+                <span class="text-[11px] text-zinc-400 block">내 목표 알림가</span>
+                <span class="text-xs font-extrabold ${isTargetMet ? 'text-emerald-500' : 'text-zinc-700 dark:text-zinc-200'}">
+                  ${formatKRW(item.target_price)}
+                </span>
+              </div>
+            </div>
+
+            <!-- 하단 재고 상태 및 무신사 바로가기 버튼 -->
+            <div class="flex items-center justify-between gap-2 pt-0.5">
+              ${stockBadgeHtml}
+
+              <div class="flex items-center gap-1.5">
+                <button type="button" data-action="drop-price" data-id="${item.id}" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition" title="10% 가격 인하 테스트">
+                  -10% 테스트
+                </button>
+                <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-black text-white dark:bg-white dark:text-black hover:opacity-90 transition">
+                  <span>무신사 이동</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderLogs() {
+      const container = document.getElementById('telegramLogContainer');
+      if (!state.logs || state.logs.length === 0) {
+        container.innerHTML = `<p class="text-zinc-400 py-2">발송된 알림 내역이 없습니다. 상단 '⚡ 변동 테스트' 또는 카드의 '-10% 테스트'를 눌러 알림을 체험해 보세요.</p>`;
+        return;
+      }
+      container.innerHTML = state.logs.slice(0, 5).map(log => `
+        <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/70 dark:border-zinc-800 flex items-start justify-between gap-2">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-zinc-900 dark:text-white">${log.badge}</span>
+              <span class="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">${log.title}</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 dark:text-zinc-400">${log.detail}</p>
+          </div>
+          <span class="text-[10px] font-mono text-zinc-400 shrink-0">${log.time}</span>
+        </div>
+      `).join('');
+    }
+
+    function pushAlertLog(badge, title, detail) {
+      const now = new Date();
+      const timeStr = now.toTimeString().slice(0, 5);
+      state.logs.unshift({ time: timeStr, badge, title, detail });
+      safeSetStorage(LOG_STORAGE_KEY, state.logs);
+      renderLogs();
+    }
+
+    function openAddModal(editId = '') {
+      const modal = document.getElementById('addModal');
+      const titleEl = document.getElementById('modalTitle');
+      const form = document.getElementById('productForm');
+      form.reset();
+
+      if (editId) {
+        const item = state.items.find(i => i.id === editId);
+        if (item) {
+          titleEl.textContent = '관심 상품 목표가 / 사이즈 수정';
+          document.getElementById('editItemId').value = item.id;
+          document.getElementById('inputUrl').value = item.url;
+          document.getElementById('inputBrand').value = item.brand;
+          document.getElementById('inputName').value = item.name;
+          document.getElementById('inputTargetSize').value = item.target_size;
+          document.getElementById('inputTargetPrice').value = item.target_price;
+          document.getElementById('inputCurrentPrice').value = item.current_price;
+          document.getElementById('inputOriginalPrice').value = item.original_price;
+          document.getElementById('inputInStock').checked = !!item.in_stock;
+          updateStockToggleLabel(!!item.in_stock);
+        }
+      } else {
+        titleEl.textContent = '무신사 관심 상품 등록';
+        document.getElementById('editItemId').value = '';
+        document.getElementById('inputInStock').checked = true;
+        updateStockToggleLabel(true);
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeAddModal() {
+      const modal = document.getElementById('addModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function updateStockToggleLabel(checked) {
+      const label = document.getElementById('stockToggleLabel');
+      if (checked) {
+        label.textContent = '구매 가능';
+        label.className = 'ml-2 text-xs font-bold text-emerald-500';
+      } else {
+        label.textContent = '품절 (재입고 대기)';
+        label.className = 'ml-2 text-xs font-bold text-rose-500';
+      }
+    }
+
+    function handleSaveProduct(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editItemId').value;
+      const rawUrl = document.getElementById('inputUrl').value.trim();
+      const goodsNo = editId || extractGoodsNo(rawUrl);
+      const url = `https://www.musinsa.com/products/${goodsNo}`;
+      const brand = document.getElementById('inputBrand').value.trim() || '무신사 브랜드';
+      const name = document.getElementById('inputName').value.trim() || `무신사 스토어 상품 #${goodsNo}`;
+      const targetSize = document.getElementById('inputTargetSize').value;
+      const targetPrice = Number(document.getElementById('inputTargetPrice').value || 0);
+      const currentPrice = Number(document.getElementById('inputCurrentPrice').value || targetPrice);
+      const originalPrice = Number(document.getElementById('inputOriginalPrice').value || currentPrice);
+      const inStock = document.getElementById('inputInStock').checked;
+
+      const discountRate = originalPrice > currentPrice
+        ? Math.round((1 - currentPrice / originalPrice) * 100)
+        : 0;
+
+      const existingIdx = state.items.findIndex(i => i.id === goodsNo);
+      const nowStr = new Date().toISOString().slice(0, 16).replace('T', ' ');
+
+      if (existingIdx >= 0) {
+        const prev = state.items[existingIdx];
+        state.items[existingIdx] = {
+          ...prev,
+          url,
+          brand,
+          name,
+          target_size: targetSize,
+          target_price: targetPrice,
+          current_price: currentPrice,
+          original_price: originalPrice,
+          lowest_price: Math.min(prev.lowest_price || currentPrice, currentPrice),
+          discount_rate: discountRate,
+          in_stock: inStock,
+          updated_at: nowStr
+        };
+        showToast('상품 추적 조건이 업데이트되었습니다');
+      } else {
+        state.items.unshift({
+          id: goodsNo,
+          url,
+          brand,
+          name,
+          target_size: targetSize,
+          target_price: targetPrice,
+          current_price: currentPrice,
+          original_price: originalPrice,
+          lowest_price: currentPrice,
+          last_price: originalPrice,
+          discount_rate: discountRate,
+          in_stock: inStock,
+          updated_at: nowStr
+        });
+        showToast('새 무신사 상품이 등록되었습니다');
+      }
+
+      safeSetStorage(STORAGE_KEY, state.items);
+      closeAddModal();
+      renderProducts();
+    }
+
+    function handleProductListClick(e) {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+
+      const action = btn.getAttribute('data-action');
+      const id = btn.getAttribute('data-id');
+      const item = state.items.find(i => i.id === id);
+      if (!item) return;
+
+      if (action === 'delete') {
+        state.items = state.items.filter(i => i.id !== id);
+        safeSetStorage(STORAGE_KEY, state.items);
+        renderProducts();
+        showToast('상품이 추적 목록에서 삭제되었습니다');
+      } else if (action === 'edit') {
+        openAddModal(id);
+      } else if (action === 'toggle-stock') {
+        const prevStock = item.in_stock;
+        item.in_stock = !prevStock;
+        safeSetStorage(STORAGE_KEY, state.items);
+        renderProducts();
+        if (!prevStock && item.in_stock) {
+          pushAlertLog(
+            `🔔 [원하던 ${item.target_size}사이즈 재입고]`,
+            `[${item.brand}] ${item.name}`,
+            `품절 ➔ 구매 가능 상태 전환! 현재가 ${formatKRW(item.current_price)}`
+          );
+          showToast(`🔔 ${item.target_size} 사이즈 재입고 알림이 생성되었습니다!`);
+        } else {
+          showToast(`${item.target_size} 사이즈가 품절(재입고 대기)로 변경되었습니다`);
+        }
+      } else if (action === 'drop-price') {
+        const oldPrice = item.current_price;
+        const newPrice = Math.round((oldPrice * 0.9) / 100) * 100;
+        item.last_price = oldPrice;
+        item.current_price = newPrice;
+        if (!item.lowest_price || newPrice < item.lowest_price) {
+          item.lowest_price = newPrice;
+        }
+        if (item.original_price > 0) {
+          item.discount_rate = Math.round((1 - newPrice / item.original_price) * 100);
+        }
+        safeSetStorage(STORAGE_KEY, state.items);
+        renderProducts();
+
+        const reached = newPrice <= item.target_price;
+        const badge = reached ? '🎯 [목표가 도달 & 가격 폭락]' : '🚨 [무신사 가격 폭락]';
+        pushAlertLog(
+          badge,
+          `[${item.brand}] ${item.name} (${item.target_size})`,
+          `${formatKRW(oldPrice)} ➔ ${formatKRW(newPrice)} (-10%) | 목표가 ${formatKRW(item.target_price)}`
+        );
+        showToast(`${badge} 텔레그램 푸시 알림 발송 시뮬레이션 완료!`);
+      }
+    }
+
+    function exportItemsJson() {
+      const jsonStr = JSON.stringify(state.items, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'items.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('items.json 백업 파일이 다운로드되었습니다');
+    }
+
+    function importItemsJson(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (Array.isArray(parsed)) {
+            state.items = parsed;
+            safeSetStorage(STORAGE_KEY, state.items);
+            renderProducts();
+            showToast(`총 ${parsed.length}개 상품 목록이 복원되었습니다`);
+          } else {
+            showToast('올바른 items.json 배열 형식이 아닙니다');
+          }
+        } catch (err) {
+          showToast('JSON 파일 파싱에 실패했습니다');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    async function sendRealTelegramTest() {
+      const token = document.getElementById('tgBotToken').value.trim();
+      const chatId = document.getElementById('tgChatId').value.trim();
+
+      if (!token || !chatId) {
+        showToast('봇 토큰과 Chat ID를 먼저 입력해 주세요');
+        return;
+      }
+
+      const sample = state.items[0] || DEFAULT_ITEMS[0];
+      const text = [
+        '🚨 *[무신사 가격 폭락 & 목표가 도달 테스트]*',
+        '',
+        `🏷 *[${sample.brand}] ${sample.name}*`,
+        `• 품번: \`${sample.id}\` | 타겟 사이즈: *${sample.target_size}* (🟢 구매 가능)`,
+        `• 가격 변화: ${formatKRW(sample.original_price)} ➔ *${formatKRW(sample.current_price)}* (-${sample.discount_rate}%)`,
+        `• 내 목표 희망가: ${formatKRW(sample.target_price)}`,
+        '',
+        `👉 [무신사 상품 바로가기](${sample.url})`
+      ].join('\n');
+
+      try {
+        const resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            parse_mode: 'Markdown'
+          })
+        });
+        if (resp.ok) {
+          showToast('✈️ 텔레그램으로 실제 푸시 알림이 전송되었습니다!');
+          pushAlertLog('✈️ [실제 텔레그램 발송 성공]', `[${sample.brand}] ${sample.name}`, '스마트폰 텔레그램 앱을 확인해 보세요.');
+        } else {
+          showToast('텔레그램 전송 실패: 토큰 또는 Chat ID를 확인하세요');
+        }
+      } catch (err) {
+        showToast('네트워크 제한으로 시뮬레이션 로그에 기록되었습니다');
+        pushAlertLog('✈️ [텔레그램 테스트]', `[${sample.brand}] ${sample.name}`, `${formatKRW(sample.current_price)} 알림 메시지 생성 완료`);
+      }
+    }
+
+    function initApp() {
+      initTheme();
+      state.items = safeGetStorage(STORAGE_KEY, DEFAULT_ITEMS);
+      state.logs = safeGetStorage(LOG_STORAGE_KEY, DEFAULT_LOGS);
+      state.settings = safeGetStorage(SETTINGS_KEY, { botToken: '', chatId: '' });
+
+      document.getElementById('tgBotToken').value = state.settings.botToken || '';
+      document.getElementById('tgChatId').value = state.settings.chatId || '';
+
+      renderProducts();
+      renderLogs();
+
+      // 이벤트 리스너 바인딩
+      document.getElementById('btnToggleTheme').addEventListener('click', toggleTheme);
+      document.getElementById('btnOpenAddModal').addEventListener('click', () => openAddModal(''));
+      document.getElementById('btnCloseAddModal').addEventListener('click', closeAddModal);
+      document.getElementById('btnCancelModal').addEventListener('click', closeAddModal);
+      document.getElementById('productForm').addEventListener('submit', handleSaveProduct);
+
+      document.getElementById('inputInStock').addEventListener('change', (e) => {
+        updateStockToggleLabel(e.target.checked);
+      });
+
+      document.getElementById('productList').addEventListener('click', handleProductListClick);
+
+      document.querySelectorAll('.filter-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.filter = btn.getAttribute('data-chip');
+          renderProducts();
+        });
+      });
+
+      document.querySelectorAll('.summary-card').forEach(card => {
+        card.addEventListener('click', () => {
+          state.filter = card.getAttribute('data-filter');
+          renderProducts();
+        });
+      });
+
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        state.search = e.target.value;
+        renderProducts();
+      });
+
+      document.getElementById('btnExportJson').addEventListener('click', exportItemsJson);
+      document.getElementById('btnImportTrigger').addEventListener('click', () => {
+        document.getElementById('fileImportInput').click();
+      });
+      document.getElementById('fileImportInput').addEventListener('change', importItemsJson);
+
+      document.getElementById('btnClearLogs').addEventListener('click', () => {
+        state.logs = [];
+        safeSetStorage(LOG_STORAGE_KEY, state.logs);
+        renderLogs();
+        showToast('알림 로그가 초기화되었습니다');
+      });
+
+      document.getElementById('btnSimulateAlert').addEventListener('click', () => {
+        if (state.items.length === 0) return;
+        const target = state.items[Math.floor(Math.random() * state.items.length)];
+        const prev = target.current_price;
+        const next = Math.round((prev * 0.88) / 100) * 100;
+        target.last_price = prev;
+        target.current_price = next;
+        target.lowest_price = Math.min(target.lowest_price || next, next);
+        target.in_stock = true;
+        safeSetStorage(STORAGE_KEY, state.items);
+        renderProducts();
+        pushAlertLog(
+          '🚨 [무신사 가격 폭락 & 재입고]',
+          `[${target.brand}] ${target.name} (${target.target_size})`,
+          `${formatKRW(prev)} ➔ ${formatKRW(next)} (-12%) | 목표가 ${formatKRW(target.target_price)}`
+        );
+        showToast(`⚡ [${target.brand}] -12% 급락 알림이 감지되었습니다!`);
+      });
+
+      // 설정 모달
+      const settingsModal = document.getElementById('settingsModal');
+      document.getElementById('btnOpenSettings').addEventListener('click', () => {
+        settingsModal.classList.remove('hidden');
+        settingsModal.classList.add('flex');
+      });
+      document.getElementById('btnCloseSettingsModal').addEventListener('click', () => {
+        settingsModal.classList.add('hidden');
+        settingsModal.classList.remove('flex');
+      });
+      document.getElementById('btnSaveSettings').addEventListener('click', () => {
+        state.settings = {
+          botToken: document.getElementById('tgBotToken').value.trim(),
+          chatId: document.getElementById('tgChatId').value.trim()
+        };
+        safeSetStorage(SETTINGS_KEY, state.settings);
+        settingsModal.classList.add('hidden');
+        settingsModal.classList.remove('flex');
+        showToast('텔레그램 연동 설정이 브라우저에 저장되었습니다');
+      });
+      document.getElementById('btnSendTestTelegram').addEventListener('click', sendRealTelegramTest);
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
