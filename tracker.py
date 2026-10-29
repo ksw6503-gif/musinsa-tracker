@@ -46,13 +46,26 @@ DEFAULT_HEADERS = {
 
 
 def extract_goods_no(url_or_id: str) -> Optional[str]:
-    """무신사 상품 URL 또는 품번 문자열에서 숫자형 상품 번호(goodsNo)를 추출합니다."""
+    """무신사 상품 URL(단축 URL 포함) 또는 품번 문자열에서 숫자형 상품 번호(goodsNo)를 추출합니다."""
     text = str(url_or_id).strip()
     if text.isdigit():
         return text
-    match = re.search(r"(?:products|app/goods)/(\d+)", text)
+    match = re.search(r"(?:products/|goods/|goodsNo=|goods_no=)(\d{4,10})", text, re.I)
     if match:
         return match.group(1)
+    # 무신사 앱 공유 단축 URL(musinsa.onelink.me 등)인 경우 리다이렉트를 추적하여 실제 상품 번호 추출
+    url_match = re.search(r"https?://[^\s]+", text)
+    if url_match:
+        raw_url = url_match.group(0)
+        if "onelink.me" in raw_url or "app.link" in raw_url or "musinsa.com" in raw_url:
+            try:
+                resp = requests.get(raw_url, headers=DEFAULT_HEADERS, allow_redirects=True, timeout=10)
+                resolved = resp.url + " " + resp.text[:4000]
+                rmatch = re.search(r"(?:products/|goods/|goodsNo=|goods_no=)(\d{4,10})", resolved, re.I)
+                if rmatch:
+                    return rmatch.group(1)
+            except Exception as e:
+                print(f"[WARN] 단축 URL 리다이렉트 추적 실패 ({raw_url}): {e}")
     digits = re.findall(r"\d{5,10}", text)
     return digits[0] if digits else None
 

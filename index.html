@@ -462,13 +462,36 @@
       return Number(num || 0).toLocaleString('ko-KR') + '원';
     }
 
-    function extractGoodsNo(input) {
+    function parseMusinsaInput(input) {
       const str = String(input || '').trim();
-      if (/^\d+$/.test(str)) return str;
-      const match = str.match(/(?:products|app\/goods)\/(\d+)/);
-      if (match) return match[1];
-      const digits = str.match(/\d{5,10}/);
-      return digits ? digits[0] : String(Date.now()).slice(-7);
+      // 1) 숫자만 입력한 경우 (품번 직접 입력)
+      if (/^\d{4,10}$/.test(str)) {
+        return { id: str, url: `https://www.musinsa.com/products/${str}`, isShortLink: false };
+      }
+      // 2) URL 안에 products/숫자, goods/숫자, goodsNo=숫자 가 명시된 경우
+      const explicitMatch = str.match(/(?:products\/|goods\/|goodsNo=|goods_no=)(\d{4,10})/i);
+      if (explicitMatch) {
+        const id = explicitMatch[1];
+        return { id, url: `https://www.musinsa.com/products/${id}`, isShortLink: false };
+      }
+      // 3) 무신사 앱 공유하기 텍스트에서 URL과 상품명 자동 분리 (예: "[무신사] 브랜드 상품명\nhttps://musinsa.onelink.me/...")
+      const urlMatch = str.match(/https?:\/\/[^\s]+/i);
+      if (urlMatch) {
+        const rawUrl = urlMatch[0];
+        // URL 안에 6~8자리 품번이獨立 세그먼트로 있는지 확인 (단, onelink.me의 앱ID/해시는 제외)
+        if (!/onelink\.me|app\.link/i.test(rawUrl)) {
+          const segMatch = rawUrl.match(/\/(\d{5,9})(?:[/?#]|$)/);
+          if (segMatch) {
+            return { id: segMatch[1], url: `https://www.musinsa.com/products/${segMatch[1]}`, isShortLink: false };
+          }
+        }
+        // 단축 URL(musinsa.onelink.me 등)은 원문 URL을 그대로 보존하여 클릭 시 실제 상품으로 정확히 이동하도록 처리
+        const shortHash = rawUrl.split('/').pop().replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) || String(Date.now()).slice(-6);
+        return { id: `LINK-${shortHash}`, url: rawUrl, isShortLink: true };
+      }
+      const fallbackDigits = str.match(/\d{5,9}/);
+      const fbId = fallbackDigits ? fallbackDigits[0] : String(Date.now()).slice(-7);
+      return { id: fbId, url: `https://www.musinsa.com/products/${fbId}`, isShortLink: false };
     }
 
     function initTheme() {
@@ -727,8 +750,9 @@
       e.preventDefault();
       const editId = document.getElementById('editItemId').value;
       const rawUrl = document.getElementById('inputUrl').value.trim();
-      const goodsNo = editId || extractGoodsNo(rawUrl);
-      const url = `https://www.musinsa.com/products/${goodsNo}`;
+      const parsed = parseMusinsaInput(rawUrl);
+      const goodsNo = editId || parsed.id;
+      const url = parsed.url;
       const brand = document.getElementById('inputBrand').value.trim() || '무신사 브랜드';
       const name = document.getElementById('inputName').value.trim() || `무신사 스토어 상품 #${goodsNo}`;
       const targetSize = document.getElementById('inputTargetSize').value;
