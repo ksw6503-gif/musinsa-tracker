@@ -4,27 +4,27 @@
     "lowest_price": 36900,
     "in_stock": true,
     "notified_target_price": 36900,
-    "updated_at": "2026-11-10 23:48"
+    "updated_at": "2026-11-11 00:41"
   },
   "4102938": {
     "current_price": 15400,
     "lowest_price": 15400,
     "in_stock": true,
     "notified_target_price": 15400,
-    "updated_at": "2026-11-10 23:48"
+    "updated_at": "2026-11-11 00:41"
   },
   "3991827": {
     "current_price": 26900,
     "lowest_price": 26900,
     "in_stock": false,
     "notified_target_price": 26900,
-    "updated_at": "2026-11-10 23:48"
+    "updated_at": "2026-11-11 00:41"
   },
   "4519201": {
     "current_price": 25900,
     "lowest_price": 25900,
     "in_stock": true,
     "notified_target_price": 25900,
-    "updated_at": "2026-11-10 23:48"
+    "updated_at": "2026-11-11 00:41"
   }
 }
