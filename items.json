@@ -19,7 +19,7 @@
       "XL": false,
       "2XL": false
     },
-    "updated_at": "2026-11-12 10:47"
+    "updated_at": "2026-11-12 11:44"
   },
   {
     "id": "4102938",
@@ -28,11 +28,11 @@
     "name": "LIDIA OFF SHOULDER T - PINK",
     "target_size": "270",
     "target_price": 109000,
-    "current_price": 15400,
+    "current_price": 19800,
     "original_price": 44000,
     "lowest_price": 15400,
-    "last_price": 19800,
-    "discount_rate": 65,
+    "last_price": 15400,
+    "discount_rate": 55,
     "in_stock": true,
     "sizes": {
       "250": false,
@@ -42,7 +42,7 @@
       "275": false,
       "280": true
     },
-    "updated_at": "2026-11-12 10:47"
+    "updated_at": "2026-11-12 11:44"
   },
   {
     "id": "3991827",
@@ -62,7 +62,7 @@
       "L": true,
       "XL": false
     },
-    "updated_at": "2026-11-12 10:47"
+    "updated_at": "2026-11-12 11:44"
   },
   {
     "id": "4519201",
@@ -83,6 +83,6 @@
       "L": true,
       "XL": true
     },
-    "updated_at": "2026-11-12 10:47"
+    "updated_at": "2026-11-12 11:44"
   }
 ]
